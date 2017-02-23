@@ -25,9 +25,13 @@ const errorPage = require('hapi-error-page');
 Register the plugin on your server.
 
 ```js
-await server.register(errorPage);
-await server.start();
-console.log(server.info.uri);
+server.register(errorPage)
+    .then(() => {
+        return server.start();
+    })
+    .then(() => {
+        console.log(server.info.uri);
+    });
 ```
 
 Throw or reply with errors as needed.

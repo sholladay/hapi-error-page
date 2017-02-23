@@ -34,7 +34,6 @@ const mockServer = async (option) => {
     if (route) {
         server.route(route);
     }
-    await server.start();
     return server;
 };
 
@@ -60,14 +59,13 @@ test('without errorPage', async (t) => {
         error      : 'Internal Server Error',
         message    : 'An internal server error occurred'
     }));
-
-    await server.stop();
 });
 
 test('throws without vision', async (t) => {
-    const err = await t.throws(mockServer({
+    const server = await mockServer({
         plugin : [errorPage]
-    }));
+    });
+    const err = await t.throws(server.start());
 
     t.true(err.message.startsWith('Plugin hapi-error-page missing dependency vision'));
 });
@@ -91,6 +89,4 @@ test('errorPage basics', async (t) => {
     ].map((str) => {
         return '<p>' + str + '</p>';
     }).join('\n') + '\n');
-
-    await server.stop();
 });
