@@ -34,8 +34,9 @@ const register = (server, option, done) => {
         };
 
         // TODO: Provide a fallback view file.
+        // const viewConf = request.server.realm.plugins.vision.manager._engines.html.config;
         // reply.view('error', context, {
-        //     path : [].concat(viewConf.path || [], __dirname)
+        //     path : [].concat(viewConf.path || [], path.join(__dirname, 'lib', 'view'))
         // });
         reply.view('error', context).code(payload.statusCode);
     });
