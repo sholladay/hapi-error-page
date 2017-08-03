@@ -1,8 +1,8 @@
 import path from 'path';
 import test from 'ava';
 import { Server } from 'hapi';
-import handlebars from 'handlebars';
 import vision from 'vision';
+import handlebars from 'handlebars';
 import errorPage from '.';
 
 const mockRoute = (option) => {
@@ -31,6 +31,15 @@ const mockServer = async (option) => {
     if (plugin) {
         await server.register(plugin);
     }
+    if (typeof server.views === 'function') {
+        server.views({
+            engines    : {
+                html : handlebars
+            },
+            relativeTo : path.join(__dirname, 'fixture'),
+            path       : '.'
+        });
+    }
     if (route) {
         server.route(route);
     }
@@ -47,7 +56,7 @@ const mockRequest = (server, option) => {
     ));
 };
 
-test('without errorPage', async (t) => {
+test('baseline without errorPage', async (t) => {
     const server = await mockServer({
         plugin : null
     });
@@ -70,23 +79,28 @@ test('throws without vision', async (t) => {
     t.true(err.message.startsWith('Plugin hapi-error-page missing dependency vision'));
 });
 
-test('errorPage basics', async (t) => {
+test('renders error to view', async (t) => {
     const server = await mockServer();
-    server.views({
-        engines    : {
-            html : handlebars
-        },
-        relativeTo : path.join(__dirname, 'fixture'),
-        path       : './'
-    });
     const response = await mockRequest(server);
 
     t.is(response.statusCode, 500);
     t.is(response.payload, [
-        'Title: Internal Server Error',
-        'Status code: 500',
-        'Message: An internal server error occurred.'
-    ].map((str) => {
-        return '<p>' + str + '</p>';
-    }).join('\n') + '\n');
+        '<p>Title: Internal Server Error</p>',
+        '<p>Status code: 500</p>',
+        '<p>Message: An internal server error occurred.</p>'
+    ].join('\n') + '\n');
+});
+
+test('ignores non-errors', async (t) => {
+    const server = await mockServer({
+        route : mockRoute({
+            handler(request, reply) {
+                reply('must succeed');
+            }
+        })
+    });
+    const response = await mockRequest(server);
+
+    t.is(response.statusCode, 200);
+    t.is(response.payload, 'must succeed');
 });

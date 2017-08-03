@@ -17,7 +17,7 @@ const register = (server, option, done) => {
     server.ext('onPreResponse', (request, reply) => {
         const { response } = request;
 
-        if (request.method !== 'get' || !response.isBoom || !acceptsHtml(request.headers.accept)) {
+        if (!response.isBoom || !acceptsHtml(request.headers.accept)) {
             reply.continue();
             return;
         }
@@ -35,7 +35,7 @@ const register = (server, option, done) => {
 
         // TODO: Provide a fallback view file.
         // reply.view('error', context, {
-        //     path : Array.from(viewManagerSettings.path || []).push(__dirname)
+        //     path : [].concat(viewConf.path || [], __dirname)
         // });
         reply.view('error', context).code(payload.statusCode);
     });
