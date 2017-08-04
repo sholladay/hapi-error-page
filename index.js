@@ -8,7 +8,8 @@ const sentencify = (input) => {
     return input[0].toUpperCase() + input.substring(1) + (input.endsWith('.') ? '' : '.');
 };
 
-const acceptsHtml = (str) => {
+const prefersHtml = (str) => {
+    // TODO: Respect q weightings: https://github.com/hapijs/accept/issues/19
     const types = accept.mediaTypes(str);
     return types.includes('text/html') || types.includes('*/*');
 };
@@ -17,7 +18,7 @@ const register = (server, option, done) => {
     server.ext('onPreResponse', (request, reply) => {
         const { response } = request;
 
-        if (!response.isBoom || !acceptsHtml(request.headers.accept)) {
+        if (!response.isBoom || !prefersHtml(request.headers.accept)) {
             reply.continue();
             return;
         }
