@@ -5,7 +5,7 @@ import vision from 'vision';
 import handlebars from 'handlebars';
 import errorPage from '.';
 
-const mockRequest = (server, option) => {
+const sendRequest = (server, option) => {
     return server.inject(Object.assign(
         {
             method : 'GET',
@@ -15,7 +15,7 @@ const mockRequest = (server, option) => {
     ));
 };
 
-const mockRoute = (option) => {
+const makeRoute = (option) => {
     return Object.assign(
         {
             method : 'GET',
@@ -28,11 +28,11 @@ const mockRoute = (option) => {
     );
 };
 
-const mockServer = async (option) => {
+const makeServer = async (option) => {
     const { plugin, route } = Object.assign(
         {
             plugin : [vision, errorPage],
-            route  : mockRoute()
+            route  : makeRoute()
         },
         option
     );
@@ -57,10 +57,10 @@ const mockServer = async (option) => {
 };
 
 test('baseline without errorPage', async (t) => {
-    const server = await mockServer({
+    const server = await makeServer({
         plugin : null
     });
-    const response = await mockRequest(server);
+    const response = await sendRequest(server);
 
     t.is(response.statusCode, 500);
     t.is(response.headers['content-type'], 'application/json; charset=utf-8');
@@ -72,7 +72,7 @@ test('baseline without errorPage', async (t) => {
 });
 
 test('throws without vision', async (t) => {
-    const server = await mockServer({
+    const server = await makeServer({
         plugin : [errorPage]
     });
     const err = await t.throws(server.start());
@@ -81,8 +81,8 @@ test('throws without vision', async (t) => {
 });
 
 test('renders error to view', async (t) => {
-    const server = await mockServer();
-    const response = await mockRequest(server);
+    const server = await makeServer();
+    const response = await sendRequest(server);
 
     t.is(response.statusCode, 500);
     t.is(response.headers['content-type'], 'text/html; charset=utf-8');
@@ -94,9 +94,9 @@ test('renders error to view', async (t) => {
 });
 
 test('honors media type header', async (t) => {
-    const server = await mockServer();
+    const server = await makeServer();
     const requestType = (accept) => {
-        return mockRequest(server, {
+        return sendRequest(server, {
             headers : { accept }
         });
     };
@@ -140,14 +140,14 @@ test('honors media type header', async (t) => {
 });
 
 test('ignores non-errors', async (t) => {
-    const server = await mockServer({
-        route : mockRoute({
+    const server = await makeServer({
+        route : makeRoute({
             handler(request, reply) {
                 reply('must succeed');
             }
         })
     });
-    const response = await mockRequest(server);
+    const response = await sendRequest(server);
 
     t.is(response.statusCode, 200);
     t.is(response.headers['content-type'], 'text/html; charset=utf-8');
