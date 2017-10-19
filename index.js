@@ -28,8 +28,8 @@ const register = (server, option, done) => {
             code    : payload.statusCode,
             title   : payload.error,
             message : sentencify(
-                payload.message ||
                 explanation[payload.statusCode] ||
+                payload.message ||
                 'Sorry, an unknown problem has arisen.'
             )
         };

@@ -89,7 +89,7 @@ test('renders error to view', async (t) => {
     t.is(response.payload, [
         '<p>Title: Internal Server Error</p>',
         '<p>Status code: 500</p>',
-        '<p>Message: An internal server error occurred.</p>'
+        '<p>Message: Sorry, an internal problem has arisen. Please try again.</p>'
     ].join('\n') + '\n');
 });
 
@@ -116,7 +116,7 @@ test('honors media type header', async (t) => {
     t.is(htmlResp.payload, [
         '<p>Title: Internal Server Error</p>',
         '<p>Status code: 500</p>',
-        '<p>Message: An internal server error occurred.</p>'
+        '<p>Message: Sorry, an internal problem has arisen. Please try again.</p>'
     ].join('\n') + '\n');
 
     const anyResp = await requestType('*/*');
@@ -125,7 +125,7 @@ test('honors media type header', async (t) => {
     t.is(anyResp.payload, [
         '<p>Title: Internal Server Error</p>',
         '<p>Status code: 500</p>',
-        '<p>Message: An internal server error occurred.</p>'
+        '<p>Message: Sorry, an internal problem has arisen. Please try again.</p>'
     ].join('\n') + '\n');
 
     // Currently fails, see: https://github.com/hapijs/accept/issues/19
