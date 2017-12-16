@@ -14,42 +14,35 @@ const prefersHtml = (str) => {
     return types.includes('text/html') || types.includes('*/*');
 };
 
-const register = (server, option, done) => {
-    server.ext('onPreResponse', (request, reply) => {
+const register = (server) => {
+    server.ext('onPreResponse', (request, h) => {
         const { response } = request;
 
         if (!response.isBoom || !prefersHtml(request.headers.accept)) {
-            reply.continue();
-            return;
+            return h.continue;
         }
 
-        const { payload } = response.output;
+        const { statusCode, message, error } = response.output.payload;
         const context = {
-            code    : payload.statusCode,
-            title   : payload.error,
-            message : sentencify(
-                explanation[payload.statusCode] ||
-                payload.message ||
-                'Sorry, an unknown problem has arisen.'
-            )
+            code    : statusCode,
+            title   : error,
+            // TODO: We should prefer payload.message in some cases, or maybe put it
+            // in a detail field. E.g. validation error caauses 400 Bad Request,
+            // responding with a generic message is not helpful
+            message : sentencify(explanation[statusCode] || message || 'Sorry, an unknown problem has arisen.')
         };
 
         // TODO: Provide a fallback view file.
         // const viewConf = request.server.realm.plugins.vision.manager._engines.html.config;
-        // reply.view('error', context, {
+        // return h.view('error', context, {
         //     path : [].concat(viewConf.path || [], path.join(__dirname, 'lib', 'view'))
         // });
-        reply.view('error', context).code(payload.statusCode);
+        return h.view('error', context).code(statusCode);
     });
-
-    done();
 };
 
-register.attributes = {
+module.exports.plugin = {
+    register,
     pkg,
     dependencies : 'vision'
-};
-
-module.exports = {
-    register
 };

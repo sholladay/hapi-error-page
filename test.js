@@ -1,43 +1,36 @@
 import path from 'path';
 import test from 'ava';
-import { Server } from 'hapi';
+import hapi from 'hapi';
 import vision from 'vision';
 import handlebars from 'handlebars';
 import errorPage from '.';
 
 const sendRequest = (server, option) => {
-    return server.inject(Object.assign(
-        {
-            method : 'GET',
-            url    : '/'
-        },
-        option
-    ));
+    return server.inject({
+        method : 'GET',
+        url    : '/',
+        ...option
+    });
 };
 
 const makeRoute = (option) => {
-    return Object.assign(
-        {
-            method : 'GET',
-            path   : '/',
-            handler(request, reply) {
-                reply(new Error('my gosh'));
-            }
+    return {
+        method : 'GET',
+        path   : '/',
+        handler() {
+            throw new Error('my gosh');
         },
-        option
-    );
+        ...option
+    };
 };
 
 const makeServer = async (option) => {
-    const { plugin, route } = Object.assign(
-        {
-            plugin : [vision, errorPage],
-            route  : makeRoute()
-        },
-        option
-    );
-    const server = new Server();
-    server.connection();
+    const { plugin, route } = {
+        plugin : [vision, errorPage],
+        route  : makeRoute(),
+        ...option
+    };
+    const server = hapi.server();
     if (plugin) {
         await server.register(plugin);
     }
@@ -142,8 +135,8 @@ test('honors media type header', async (t) => {
 test('ignores non-errors', async (t) => {
     const server = await makeServer({
         route : makeRoute({
-            handler(request, reply) {
-                reply('must succeed');
+            handler() {
+                return 'must succeed';
             }
         })
     });
