@@ -1,66 +1,66 @@
 {
-  "name": "hapi-error-page",
-  "version": "0.3.0",
-  "description": "Friendly error pages for humans.",
-  "homepage": "https://github.com/sholladay/hapi-error-page",
-  "main": "index.js",
-  "author": {
-    "name": "Seth Holladay",
-    "url": "http://seth-holladay.com",
-    "email": "me@seth-holladay.com"
-  },
-  "scripts": {
-    "test": "xo && ava"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:sholladay/hapi-error-page.git"
-  },
-  "bugs": {
-    "url": "https://github.com/sholladay/hapi-error-page/issues",
-    "email": "me@seth-holladay.com"
-  },
-  "engines": {
-    "node": ">=6"
-  },
-  "license": "MPL-2.0",
-  "files": [
-    "lib",
-    "index.js"
-  ],
-  "dependencies": {
-    "accept": "^2.1.3"
-  },
-  "devDependencies": {
-    "ava": "^0.18.1",
-    "eslint-config-tidy": "^0.4.0",
-    "handlebars": "^4.0.6",
-    "hapi": "^16.1.0",
-    "vision": "^4.1.1",
-    "xo": "^0.17.0"
-  },
-  "keywords": [
-    "hapi",
-    "plugin",
-    "human",
-    "friendly",
-    "pretty",
-    "beautiful",
-    "html",
-    "issue",
-    "issues",
-    "problem",
-    "problems",
-    "error",
-    "errors",
-    "exception",
-    "exceptions",
-    "crash",
-    "crashes",
-    "page",
-    "pages"
-  ],
-  "xo": {
-    "extend": "tidy"
-  }
+    "name": "hapi-error-page",
+    "version": "0.3.0",
+    "description": "Friendly error pages for humans",
+    "homepage": "https://github.com/sholladay/hapi-error-page",
+    "main": "index.js",
+    "author": {
+        "name": "Seth Holladay",
+        "url": "https://seth-holladay.com",
+        "email": "me@seth-holladay.com"
+    },
+    "scripts": {
+        "test": "xo && ava"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:sholladay/hapi-error-page.git"
+    },
+    "bugs": {
+        "url": "https://github.com/sholladay/hapi-error-page/issues",
+        "email": "me@seth-holladay.com"
+    },
+    "engines": {
+        "node": ">=8"
+    },
+    "license": "MPL-2.0",
+    "files": [
+        "lib",
+        "index.js"
+    ],
+    "dependencies": {
+        "accept": "^2.1.3"
+    },
+    "devDependencies": {
+        "ava": "^0.18.1",
+        "eslint-config-tidy": "^0.4.0",
+        "handlebars": "^4.0.6",
+        "hapi": "^16.1.0",
+        "vision": "^4.1.1",
+        "xo": "^0.17.0"
+    },
+    "keywords": [
+        "hapi",
+        "plugin",
+        "human",
+        "friendly",
+        "pretty",
+        "beautiful",
+        "html",
+        "issue",
+        "issues",
+        "problem",
+        "problems",
+        "error",
+        "errors",
+        "exception",
+        "exceptions",
+        "crash",
+        "crashes",
+        "page",
+        "pages"
+    ],
+    "xo": {
+        "extend": "tidy"
+    }
 }
