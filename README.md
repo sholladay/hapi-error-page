@@ -16,37 +16,44 @@ npm install hapi-error-page --save
 
 ## Usage
 
-Get it into your program.
+Register the plugin on your server to enable friendly error pages.
 
 ```js
+const hapi = require('hapi');
+const vision = require('vision');
 const errorPage = require('hapi-error-page');
-```
 
-Register the plugin on your server.
+const server = hapi.server();
 
-```js
-server.register(errorPage)
-    .then(() => {
-        return server.start();
-    })
-    .then(() => {
-        console.log(server.info.uri);
+const init = async () => {
+    await server.register([
+        vision,
+        errorPage
+    ]);
+    server.views({
+        engines    : {
+            html : handlebars
+        },
+        relativeTo : __dirname,
+        path       : '.'
     });
+    server.route({
+        method : 'GET',
+        path   : '/',
+        handler() {
+            throw new Error('uh oh');
+        }
+    });
+    await server.start();
+    console.log('Server ready:', server.info.uri);
+};
+
+init();
 ```
 
-Throw or reply with errors as needed.
+Visiting the above route will return an HTML error page rendered by [Handlebars](https://github.com/wycats/handlebars.js/) from a view file named `error.html`. You can, of course, use other templating engines instead (see the [vision](https://github.com/hapijs/vision) documentation for details).
 
-```js
-server.route({
-    method : 'GET',
-    path   : '/',
-    handler(request, reply) {
-        throw new Error('uh oh');
-    }
-})
-```
-
-Please use [boom](https://github.com/hapijs/boom) to construct errors instead of `new Error()`, so that we can deliver more useful messages. However, this project will function correctly either way.
+Please use [boom](https://github.com/hapijs/boom) to construct errors instead of `new Error()`, so that we can deliver more useful messages. This project will function correctly either way, but `boom` is preferred.
 
 ## Contributing
 
