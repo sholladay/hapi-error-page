@@ -4,8 +4,9 @@ const accept = require('accept');
 const explanation = require('./lib/explanation');
 const pkg = require('./package.json');
 
-const sentencify = (input) => {
-    return input[0].toUpperCase() + input.substring(1) + (input.endsWith('.') ? '' : '.');
+const explain = (statusCode) => {
+    const text = explanation[statusCode];
+    return text && text[0].toUpperCase() + text.substring(1) + (text.endsWith('.') ? '' : '.');
 };
 
 const prefersHtml = (str) => {
@@ -23,13 +24,14 @@ const register = (server) => {
         }
 
         const { statusCode, message, error } = response.output.payload;
+        const isCanned = message === error;
         const context = {
             code    : statusCode,
-            title   : error,
-            // TODO: We should prefer payload.message in some cases, or maybe put it
-            // in a detail field. E.g. validation error caauses 400 Bad Request,
-            // responding with a generic message is not helpful
-            message : sentencify(explanation[statusCode] || message || 'Sorry, an unknown problem has arisen.')
+            title   : error || 'Unknown Error',
+            message : (isCanned ? '' : message) ||
+                explain(statusCode) ||
+                error ||
+                'Sorry, an unknown problem has arisen.'
         };
 
         // TODO: Provide a fallback view file.
