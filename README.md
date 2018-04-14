@@ -2,11 +2,13 @@
 
 > Friendly error pages for humans
 
+This [hapi](https://hapijs.com) plugin makes it easy to return beautiful HTML error pages to your users.
+
 ## Why?
 
- - Errors in [hapi](https://hapijs.com) are displayed as [JSON](https://json.org) by default.
+ - Errors in hapi are displayed as [JSON](https://json.org) by default.
  - JSON is good for machines but bad for people.
- - Only transforms user-visible errors.
+ - Works with AJAX / APIs (respects the [`Accept`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept) header).
 
 ## Install
 
