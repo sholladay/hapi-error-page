@@ -1,6 +1,6 @@
 {
     "name": "hapi-error-page",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "Friendly error pages for humans",
     "homepage": "https://github.com/sholladay/hapi-error-page",
     "main": "index.js",
