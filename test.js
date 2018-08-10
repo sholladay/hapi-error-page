@@ -131,16 +131,15 @@ test('honors media type header', async (t) => {
         '<p>Message: An internal server error occurred</p>'
     ].join('\n') + '\n');
 
-    // Currently fails, see: https://github.com/hapijs/accept/issues/19
-    // const jsonPreferred = await requestType('application/json, text/html;q=0.9');
-    // t.is(jsonPreferred.statusCode, 500);
-    // t.is(jsonPreferred.statusMessage, 'Internal Server Error');
-    // t.is(jsonPreferred.headers['content-type'], 'application/json; charset=utf-8');
-    // t.is(jsonPreferred.payload, JSON.stringify({
-    //     statusCode : 500,
-    //     error      : 'Internal Server Error',
-    //     message    : 'An internal server error occurred'
-    // }));
+    const jsonPreferred = await requestType('text/html;q=0.9, application/json');
+    t.is(jsonPreferred.statusCode, 500);
+    t.is(jsonPreferred.statusMessage, 'Internal Server Error');
+    t.is(jsonPreferred.headers['content-type'], 'application/json; charset=utf-8');
+    t.is(jsonPreferred.payload, JSON.stringify({
+        statusCode : 500,
+        error      : 'Internal Server Error',
+        message    : 'An internal server error occurred'
+    }));
 });
 
 test('ignores non-errors', async (t) => {

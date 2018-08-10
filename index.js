@@ -10,9 +10,7 @@ const explain = (statusCode) => {
 };
 
 const prefersHtml = (str) => {
-    // TODO: Respect q weightings: https://github.com/hapijs/accept/issues/19
-    const types = accept.mediaTypes(str);
-    return types.includes('text/html') || types.includes('*/*');
+    return ['text/html', 'text/*', '*/*'].includes(accept.mediaTypes(str)[0]);
 };
 
 const register = (server) => {
