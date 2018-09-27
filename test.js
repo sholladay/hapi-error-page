@@ -7,14 +7,6 @@ import vision from 'vision';
 import handlebars from 'handlebars';
 import errorPage from '.';
 
-const sendRequest = (server, option) => {
-    return server.inject({
-        method : 'GET',
-        url    : '/',
-        ...option
-    });
-};
-
 const makeRoute = (option) => {
     return {
         method : 'GET',
@@ -27,9 +19,8 @@ const makeRoute = (option) => {
 };
 
 const makeServer = async (option) => {
-    const { plugin, route } = {
+    const { plugin } = {
         plugin : [cookie, vision, errorPage],
-        route  : makeRoute(),
         ...option
     };
     const server = hapi.server();
@@ -45,17 +36,13 @@ const makeServer = async (option) => {
             path       : '.'
         });
     }
-    if (route) {
-        server.route(route);
-    }
     return server;
 };
 
 test('baseline without errorPage', async (t) => {
-    const server = await makeServer({
-        plugin : null
-    });
-    const response = await sendRequest(server);
+    const server = await makeServer({ plugin : null });
+    server.route(makeRoute());
+    const response = await server.inject('/');
 
     t.is(response.statusCode, 500);
     t.is(response.statusMessage, 'Internal Server Error');
@@ -68,9 +55,7 @@ test('baseline without errorPage', async (t) => {
 });
 
 test('throws without vision', async (t) => {
-    const server = await makeServer({
-        plugin : [errorPage]
-    });
+    const server = await makeServer({ plugin : [errorPage] });
     const err = await t.throwsAsync(server.start());
 
     t.true(err.message.startsWith('Plugin hapi-error-page missing dependency vision'));
@@ -78,7 +63,8 @@ test('throws without vision', async (t) => {
 
 test('renders error to view', async (t) => {
     const server = await makeServer();
-    const response = await sendRequest(server);
+    server.route(makeRoute());
+    const response = await server.inject('/');
 
     t.is(response.statusCode, 500);
     t.is(response.statusMessage, 'Internal Server Error');
@@ -93,8 +79,10 @@ test('renders error to view', async (t) => {
 
 test('honors media type header', async (t) => {
     const server = await makeServer();
+    server.route(makeRoute());
     const requestType = (accept) => {
-        return sendRequest(server, {
+        return server.inject({
+            url     : '/',
             headers : { accept }
         });
     };
@@ -143,14 +131,13 @@ test('honors media type header', async (t) => {
 });
 
 test('ignores non-errors', async (t) => {
-    const server = await makeServer({
-        route : makeRoute({
-            handler() {
-                return 'must succeed';
-            }
-        })
-    });
-    const response = await sendRequest(server);
+    const server = await makeServer();
+    server.route(makeRoute({
+        handler() {
+            return 'must succeed';
+        }
+    }));
+    const response = await server.inject('/');
 
     t.is(response.statusCode, 200);
     t.is(response.statusMessage, 'OK');
@@ -159,19 +146,21 @@ test('ignores non-errors', async (t) => {
 });
 
 test('messages that mirror the title are transformed', async (t) => {
-    const server = await makeServer({
-        route : makeRoute({
-            handler() {
-                throw boom.badRequest();
-            }
-        })
-    });
+    const server = await makeServer();
+    server.route(makeRoute({
+        handler() {
+            throw boom.badRequest();
+        }
+    }));
     server.auth.strategy('session', 'cookie', {
         password : 'password-should-be-32-characters'
     });
     server.auth.default('session');
 
-    const response = await sendRequest(server, { credentials : {} });
+    const response = await server.inject({
+        url         : '/',
+        credentials : {}
+    });
 
     t.is(response.statusCode, 400);
     t.is(response.statusMessage, 'Bad Request');
@@ -185,14 +174,13 @@ test('messages that mirror the title are transformed', async (t) => {
 });
 
 test('custom boom error messages pass through', async (t) => {
-    const server = await makeServer({
-        route : makeRoute({
-            handler() {
-                throw boom.badRequest('hi');
-            }
-        })
-    });
-    const response = await sendRequest(server);
+    const server = await makeServer();
+    server.route(makeRoute({
+        handler() {
+            throw boom.badRequest('hi');
+        }
+    }));
+    const response = await server.inject('/');
 
     t.is(response.statusCode, 400);
     t.is(response.statusMessage, 'Bad Request');
