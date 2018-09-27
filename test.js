@@ -71,7 +71,7 @@ test('throws without vision', async (t) => {
     const server = await makeServer({
         plugin : [errorPage]
     });
-    const err = await t.throws(server.start());
+    const err = await t.throwsAsync(server.start());
 
     t.true(err.message.startsWith('Plugin hapi-error-page missing dependency vision'));
 });
