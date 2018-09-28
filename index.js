@@ -10,7 +10,7 @@ const explain = (statusCode) => {
 };
 
 const prefersHtml = (str) => {
-    return ['text/html', 'text/*', '*/*'].includes(accept.mediaTypes(str)[0]);
+    return ['text/html', 'text/*'].includes(accept.mediaTypes(str)[0]);
 };
 
 const register = (server) => {

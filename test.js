@@ -61,23 +61,22 @@ test('throws without vision', async (t) => {
     t.true(err.message.startsWith('Plugin hapi-error-page missing dependency vision'));
 });
 
-test('renders error to view', async (t) => {
+test('ignores requests without accept header', async (t) => {
     const server = await makeServer();
     server.route(makeRoute());
     const response = await server.inject('/');
 
     t.is(response.statusCode, 500);
     t.is(response.statusMessage, 'Internal Server Error');
-    t.is(response.headers['content-type'], 'text/html; charset=utf-8');
-    t.is(response.payload, [
-        '<p>Title: Internal Server Error</p>',
-        '<p>isAuthenticated: false</p>',
-        '<p>Status code: 500</p>',
-        '<p>Message: An internal server error occurred</p>'
-    ].join('\n') + '\n');
+    t.is(response.headers['content-type'], 'application/json; charset=utf-8');
+    t.is(response.payload, JSON.stringify({
+        statusCode : 500,
+        error      : 'Internal Server Error',
+        message    : 'An internal server error occurred'
+    }));
 });
 
-test('honors media type header', async (t) => {
+test('honors accept header', async (t) => {
     const server = await makeServer();
     server.route(makeRoute());
     const requestType = (accept) => {
@@ -86,6 +85,16 @@ test('honors media type header', async (t) => {
             headers : { accept }
         });
     };
+
+    const anyResp = await requestType('*/*');
+    t.is(anyResp.statusCode, 500);
+    t.is(anyResp.statusMessage, 'Internal Server Error');
+    t.is(anyResp.headers['content-type'], 'application/json; charset=utf-8');
+    t.is(anyResp.payload, JSON.stringify({
+        statusCode : 500,
+        error      : 'Internal Server Error',
+        message    : 'An internal server error occurred'
+    }));
 
     const jsonResp = await requestType('application/json');
     t.is(jsonResp.statusCode, 500);
@@ -108,11 +117,11 @@ test('honors media type header', async (t) => {
         '<p>Message: An internal server error occurred</p>'
     ].join('\n') + '\n');
 
-    const anyResp = await requestType('*/*');
-    t.is(anyResp.statusCode, 500);
-    t.is(anyResp.statusMessage, 'Internal Server Error');
-    t.is(anyResp.headers['content-type'], 'text/html; charset=utf-8');
-    t.is(anyResp.payload, [
+    const textResp = await requestType('text/*');
+    t.is(textResp.statusCode, 500);
+    t.is(textResp.statusMessage, 'Internal Server Error');
+    t.is(textResp.headers['content-type'], 'text/html; charset=utf-8');
+    t.is(textResp.payload, [
         '<p>Title: Internal Server Error</p>',
         '<p>isAuthenticated: false</p>',
         '<p>Status code: 500</p>',
@@ -145,7 +154,7 @@ test('ignores non-errors', async (t) => {
     t.is(response.payload, 'must succeed');
 });
 
-test('messages that mirror the title are transformed', async (t) => {
+test('default boom error messages are transformed', async (t) => {
     const server = await makeServer();
     server.route(makeRoute({
         handler() {
@@ -159,7 +168,10 @@ test('messages that mirror the title are transformed', async (t) => {
 
     const response = await server.inject({
         url         : '/',
-        credentials : {}
+        credentials : {},
+        headers     : {
+            accept : 'text/html'
+        }
     });
 
     t.is(response.statusCode, 400);
@@ -173,14 +185,19 @@ test('messages that mirror the title are transformed', async (t) => {
     ].join('\n') + '\n');
 });
 
-test('custom boom error messages pass through', async (t) => {
+test('custom boom error messages are rendered as-is', async (t) => {
     const server = await makeServer();
     server.route(makeRoute({
         handler() {
             throw boom.badRequest('hi');
         }
     }));
-    const response = await server.inject('/');
+    const response = await server.inject({
+        url     : '/',
+        headers : {
+            accept : 'text/html'
+        }
+    });
 
     t.is(response.statusCode, 400);
     t.is(response.statusMessage, 'Bad Request');
@@ -190,5 +207,32 @@ test('custom boom error messages pass through', async (t) => {
         '<p>isAuthenticated: false</p>',
         '<p>Status code: 400</p>',
         '<p>Message: hi</p>'
+    ].join('\n') + '\n');
+});
+
+test('indicates when a request is authenticated', async (t) => {
+    const server = await makeServer();
+    server.route(makeRoute());
+    server.auth.strategy('session', 'cookie', {
+        password : 'password-should-be-32-characters'
+    });
+    server.auth.default('session');
+
+    const response = await server.inject({
+        url         : '/',
+        credentials : {},
+        headers     : {
+            accept : 'text/html'
+        }
+    });
+
+    t.is(response.statusCode, 500);
+    t.is(response.statusMessage, 'Internal Server Error');
+    t.is(response.headers['content-type'], 'text/html; charset=utf-8');
+    t.is(response.payload, [
+        '<p>Title: Internal Server Error</p>',
+        '<p>isAuthenticated: true</p>',
+        '<p>Status code: 500</p>',
+        '<p>Message: An internal server error occurred</p>'
     ].join('\n') + '\n');
 });
