@@ -54,9 +54,9 @@ test('baseline without errorPage', async (t) => {
 
 test('throws without vision', async (t) => {
     const server = await makeServer({ plugin : [errorPage] });
-    const err = await t.throwsAsync(server.start());
+    const error = await t.throwsAsync(server.start());
 
-    t.true(err.message.startsWith('Plugin hapi-error-page missing dependency vision'));
+    t.true(error.message.startsWith('Plugin hapi-error-page missing dependency vision'));
 });
 
 test('ignores requests without accept header', async (t) => {
@@ -160,13 +160,16 @@ test('default boom error messages are transformed', async (t) => {
         }
     }));
     server.auth.strategy('session', 'cookie', {
-        password : 'password-should-be-32-characters'
+        cookie : { password : 'password-should-be-32-characters' }
     });
     server.auth.default('session');
 
     const response = await server.inject({
+        auth : {
+            strategy    : 'session',
+            credentials : {}
+        },
         url         : '/',
-        credentials : {},
         headers     : {
             accept : 'text/html'
         }
@@ -212,13 +215,16 @@ test('indicates when a request is authenticated', async (t) => {
     const server = await makeServer();
     server.route(makeRoute());
     server.auth.strategy('session', 'cookie', {
-        password : 'password-should-be-32-characters'
+        cookie : { password : 'password-should-be-32-characters' }
     });
     server.auth.default('session');
 
     const response = await server.inject({
+        auth : {
+            strategy    : 'session',
+            credentials : {}
+        },
         url         : '/',
-        credentials : {},
         headers     : {
             accept : 'text/html'
         }
