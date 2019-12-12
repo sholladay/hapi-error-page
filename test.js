@@ -169,8 +169,8 @@ test('default boom error messages are transformed', async (t) => {
             strategy    : 'session',
             credentials : {}
         },
-        url         : '/',
-        headers     : {
+        url     : '/',
+        headers : {
             accept : 'text/html'
         }
     });
@@ -224,8 +224,8 @@ test('indicates when a request is authenticated', async (t) => {
             strategy    : 'session',
             credentials : {}
         },
-        url         : '/',
-        headers     : {
+        url     : '/',
+        headers : {
             accept : 'text/html'
         }
     });
@@ -238,5 +238,31 @@ test('indicates when a request is authenticated', async (t) => {
         '<p>isAuthenticated: true</p>',
         '<p>Status code: 500</p>',
         '<p>Message: An internal server error occurred</p>'
+    ].join('\n') + '\n');
+});
+
+test('respects boom headers', async (t) => {
+    const server = await makeServer();
+    server.route(makeRoute({
+        handler() {
+            throw boom.unauthorized(null, 'my-scheme');
+        }
+    }));
+    const response = await server.inject({
+        url     : '/',
+        headers : {
+            accept : 'text/html'
+        }
+    });
+
+    t.is(response.statusCode, 401);
+    t.is(response.statusMessage, 'Unauthorized');
+    t.is(response.headers['content-type'], 'text/html; charset=utf-8');
+    t.is(response.headers['www-authenticate'], 'my-scheme ');
+    t.is(response.payload, [
+        '<p>Title: Unauthorized</p>',
+        '<p>isAuthenticated: false</p>',
+        '<p>Status code: 401</p>',
+        '<p>Message: Please log in to view that page.</p>'
     ].join('\n') + '\n');
 });

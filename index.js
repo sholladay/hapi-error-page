@@ -34,10 +34,14 @@ const register = (server) => {
 
         // TODO: Provide a fallback view file.
         // const viewConf = request.server.realm.plugins.vision.manager._engines.html.config;
-        // return h.view('error', context, {
+        // const result = h.view('error', context, {
         //     path : [].concat(viewConf.path || [], path.join(__dirname, 'lib', 'view'))
         // });
-        return h.view('error', context).code(statusCode);
+        const result = h.view('error', context).code(statusCode);
+        for (const [key, value] of Object.entries(response.output.headers)) {
+            result.header(key, value);
+        }
+        return result;
     });
 };
 
