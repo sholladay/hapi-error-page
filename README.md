@@ -1,4 +1,4 @@
-# hapi-error-page [![Build status for hapi Error Page](https://img.shields.io/circleci/project/sholladay/hapi-error-page/master.svg "Build Status")](https://circleci.com/gh/sholladay/hapi-error-page "Builds")
+# hapi-error-page [![Build status for hapi Error Page](https://travis-ci.com/sholladay/hapi-error-page.svg?branch=master "Build Status")](https://travis-ci.com/sholladay/hapi-error-page "Builds")
 
 > Friendly error pages for humans
 
