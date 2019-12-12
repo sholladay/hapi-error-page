@@ -29,20 +29,20 @@
         "index.js"
     ],
     "peerDependencies": {
-        "hapi": ">=17"
+        "@hapi/hapi": ">=18"
     },
     "dependencies": {
-        "accept": "^3.0.2"
+        "@hapi/accept": "^4.0.0"
     },
     "devDependencies": {
-        "ava": "^1.0.0-beta.3",
-        "boom": "^7.2.0",
-        "hapi-auth-cookie": "^9.0.0",
-        "eslint-config-tidy": "^0.6.0",
-        "handlebars": "^4.0.6",
-        "hapi": "^17.1.1",
-        "vision": "^5.2.0",
-        "xo": "0.23.0"
+        "@hapi/boom": "^8.0.1",
+        "@hapi/cookie": "^10.1.2",
+        "@hapi/hapi": "^18.4.0",
+        "@hapi/vision": "^5.5.4",
+        "ava": "^2.4.0",
+        "eslint-config-tidy": "^0.10.0",
+        "handlebars": "^4.5.3",
+        "xo": "^0.25.3"
     },
     "keywords": [
         "hapi",

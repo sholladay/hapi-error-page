@@ -13,7 +13,7 @@ This [hapi](https://hapijs.com) plugin makes it easy to return beautiful HTML er
 ## Install
 
 ```sh
-npm install hapi-error-page --save
+npm install hapi-error-page
 ```
 
 ## Usage
@@ -21,21 +21,16 @@ npm install hapi-error-page --save
 Register the plugin on your server to enable friendly error pages.
 
 ```js
-const hapi = require('hapi');
-const vision = require('vision');
+const hapi = require('@hapi/hapi');
+const vision = require('@hapi/vision');
 const errorPage = require('hapi-error-page');
 
 const server = hapi.server();
 
 const init = async () => {
-    await server.register([
-        vision,
-        errorPage
-    ]);
+    await server.register([vision, errorPage]);
     server.views({
-        engines    : {
-            html : handlebars
-        },
+        engines    : { html : handlebars },
         relativeTo : __dirname,
         path       : '.'
     });

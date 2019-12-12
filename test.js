@@ -1,9 +1,9 @@
 import path from 'path';
 import test from 'ava';
-import hapi from 'hapi';
-import boom from 'boom';
-import cookie from 'hapi-auth-cookie';
-import vision from 'vision';
+import hapi from '@hapi/hapi';
+import boom from '@hapi/boom';
+import cookie from '@hapi/cookie';
+import vision from '@hapi/vision';
 import handlebars from 'handlebars';
 import errorPage from '.';
 
@@ -29,9 +29,7 @@ const makeServer = async (option) => {
     }
     if (typeof server.views === 'function') {
         server.views({
-            engines    : {
-                html : handlebars
-            },
+            engines    : { html : handlebars },
             relativeTo : path.join(__dirname, 'fixture'),
             path       : '.'
         });

@@ -1,12 +1,12 @@
 'use strict';
 
-const accept = require('accept');
+const accept = require('@hapi/accept');
 const explanation = require('./lib/explanation');
 const pkg = require('./package.json');
 
 const explain = (statusCode) => {
     const text = explanation[statusCode];
-    return text && text[0].toUpperCase() + text.substring(1) + (text.endsWith('.') ? '' : '.');
+    return text && text[0].toUpperCase() + text.slice(1) + (text.endsWith('.') ? '' : '.');
 };
 
 const prefersHtml = (str) => {
