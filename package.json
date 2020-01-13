@@ -21,7 +21,7 @@
         "email": "me@seth-holladay.com"
     },
     "engines": {
-        "node": ">=10"
+        "node": ">=12"
     },
     "license": "MPL-2.0",
     "files": [
@@ -32,13 +32,13 @@
         "@hapi/hapi": ">=18"
     },
     "dependencies": {
-        "@hapi/accept": "^4.0.0"
+        "@hapi/accept": "^5.0.0"
     },
     "devDependencies": {
-        "@hapi/boom": "^8.0.1",
-        "@hapi/cookie": "^10.1.2",
-        "@hapi/hapi": "^18.4.0",
-        "@hapi/vision": "^5.5.4",
+        "@hapi/boom": "^9.0.0",
+        "@hapi/cookie": "^11.0.0",
+        "@hapi/hapi": "^19.0.3",
+        "@hapi/vision": "^6.0.0",
         "ava": "^2.4.0",
         "eslint-config-tidy": "^0.10.0",
         "handlebars": "^4.5.3",

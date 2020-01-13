@@ -48,5 +48,5 @@ const register = (server) => {
 module.exports.plugin = {
     register,
     pkg,
-    dependencies : 'vision'
+    dependencies : '@hapi/vision'
 };

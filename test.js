@@ -41,7 +41,6 @@ test('baseline without errorPage', async (t) => {
     const server = await makeServer({ plugin : null });
     server.route(makeRoute());
     const response = await server.inject('/');
-
     t.is(response.statusCode, 500);
     t.is(response.statusMessage, 'Internal Server Error');
     t.is(response.headers['content-type'], 'application/json; charset=utf-8');
@@ -54,16 +53,19 @@ test('baseline without errorPage', async (t) => {
 
 test('throws without vision', async (t) => {
     const server = await makeServer({ plugin : [errorPage] });
-    const error = await t.throwsAsync(server.start());
+    const error = await t.throwsAsync(server.initialize());
+    t.is(error.message, 'Plugin hapi-error-page missing dependency @hapi/vision');
+});
 
-    t.true(error.message.startsWith('Plugin hapi-error-page missing dependency vision'));
+test('server can initialize', async (t) => {
+    const server = await makeServer();
+    await t.notThrowsAsync(server.initialize());
 });
 
 test('ignores requests without accept header', async (t) => {
     const server = await makeServer();
     server.route(makeRoute());
     const response = await server.inject('/');
-
     t.is(response.statusCode, 500);
     t.is(response.statusMessage, 'Internal Server Error');
     t.is(response.headers['content-type'], 'application/json; charset=utf-8');
@@ -258,7 +260,7 @@ test('respects boom headers', async (t) => {
     t.is(response.statusCode, 401);
     t.is(response.statusMessage, 'Unauthorized');
     t.is(response.headers['content-type'], 'text/html; charset=utf-8');
-    t.is(response.headers['www-authenticate'], 'my-scheme ');
+    t.is(response.headers['www-authenticate'], 'my-scheme');
     t.is(response.payload, [
         '<p>Title: Unauthorized</p>',
         '<p>isAuthenticated: false</p>',
