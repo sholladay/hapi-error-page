@@ -9,8 +9,9 @@ const explain = (statusCode) => {
     return text && text[0].toUpperCase() + text.slice(1) + (text.endsWith('.') ? '' : '.');
 };
 
-const prefersHtml = (str) => {
-    return ['text/html', 'text/*'].includes(accept.mediaTypes(str)[0]);
+const prefersHtml = (acceptHeader) => {
+    const preferredType = accept.mediaType(acceptHeader, ['application/json', 'text/html']);
+    return preferredType === 'text/html';
 };
 
 const register = (server) => {

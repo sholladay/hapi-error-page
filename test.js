@@ -86,56 +86,46 @@ test('honors accept header', async (t) => {
         });
     };
 
-    const anyResp = await requestType('*/*');
-    t.is(anyResp.statusCode, 500);
-    t.is(anyResp.statusMessage, 'Internal Server Error');
-    t.is(anyResp.headers['content-type'], 'application/json; charset=utf-8');
-    t.is(anyResp.payload, JSON.stringify({
-        statusCode : 500,
-        error      : 'Internal Server Error',
-        message    : 'An internal server error occurred'
+    const htmlAcceptHeaders = [
+        'text/*',
+        'text/html',
+        'text/html,application/json;q=0.9',
+        'application/json;q=0.9,text/html',
+        'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+    ];
+
+    const jsonAcceptHeaders = [
+        '*/*',
+        'application/*',
+        'application/json',
+        'application/json,text/html',
+        'text/html;q=0.9,application/json',
+        'text/plain'
+    ];
+
+    await Promise.all(htmlAcceptHeaders.map(async (htmlAcceptHeader) => {
+        const htmlResponse = await requestType(htmlAcceptHeader);
+        t.is(htmlResponse.statusCode, 500);
+        t.is(htmlResponse.statusMessage, 'Internal Server Error');
+        t.is(htmlResponse.headers['content-type'], 'text/html; charset=utf-8');
+        t.is(htmlResponse.payload, [
+            '<p>Title: Internal Server Error</p>',
+            '<p>isAuthenticated: false</p>',
+            '<p>Status code: 500</p>',
+            '<p>Message: An internal server error occurred</p>'
+        ].join('\n') + '\n');
     }));
 
-    const jsonResp = await requestType('application/json');
-    t.is(jsonResp.statusCode, 500);
-    t.is(jsonResp.statusMessage, 'Internal Server Error');
-    t.is(jsonResp.headers['content-type'], 'application/json; charset=utf-8');
-    t.is(jsonResp.payload, JSON.stringify({
-        statusCode : 500,
-        error      : 'Internal Server Error',
-        message    : 'An internal server error occurred'
-    }));
-
-    const htmlResp = await requestType('text/html');
-    t.is(htmlResp.statusCode, 500);
-    t.is(htmlResp.statusMessage, 'Internal Server Error');
-    t.is(htmlResp.headers['content-type'], 'text/html; charset=utf-8');
-    t.is(htmlResp.payload, [
-        '<p>Title: Internal Server Error</p>',
-        '<p>isAuthenticated: false</p>',
-        '<p>Status code: 500</p>',
-        '<p>Message: An internal server error occurred</p>'
-    ].join('\n') + '\n');
-
-    const textResp = await requestType('text/*');
-    t.is(textResp.statusCode, 500);
-    t.is(textResp.statusMessage, 'Internal Server Error');
-    t.is(textResp.headers['content-type'], 'text/html; charset=utf-8');
-    t.is(textResp.payload, [
-        '<p>Title: Internal Server Error</p>',
-        '<p>isAuthenticated: false</p>',
-        '<p>Status code: 500</p>',
-        '<p>Message: An internal server error occurred</p>'
-    ].join('\n') + '\n');
-
-    const jsonPreferred = await requestType('text/html;q=0.9, application/json');
-    t.is(jsonPreferred.statusCode, 500);
-    t.is(jsonPreferred.statusMessage, 'Internal Server Error');
-    t.is(jsonPreferred.headers['content-type'], 'application/json; charset=utf-8');
-    t.is(jsonPreferred.payload, JSON.stringify({
-        statusCode : 500,
-        error      : 'Internal Server Error',
-        message    : 'An internal server error occurred'
+    await Promise.all(jsonAcceptHeaders.map(async (jsonAcceptHeader) => {
+        const jsonResponse = await requestType(jsonAcceptHeader);
+        t.is(jsonResponse.statusCode, 500);
+        t.is(jsonResponse.statusMessage, 'Internal Server Error');
+        t.is(jsonResponse.headers['content-type'], 'application/json; charset=utf-8');
+        t.is(jsonResponse.payload, JSON.stringify({
+            statusCode : 500,
+            error      : 'Internal Server Error',
+            message    : 'An internal server error occurred'
+        }));
     }));
 });
 
