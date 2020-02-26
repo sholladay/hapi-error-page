@@ -89,7 +89,13 @@ test('honors accept header', async (t) => {
     const htmlAcceptHeaders = [
         'text/*',
         'text/html',
+        '*/*,text/*',
+        '*/*,text/html',
+        '*/*,application/json;q=0.9',
+        'text/*,application/json;q=0.9',
         'text/html,application/json;q=0.9',
+        'application/json;q=0.9,*/*',
+        'application/json;q=0.9,text/*',
         'application/json;q=0.9,text/html',
         'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
     ];
@@ -98,7 +104,13 @@ test('honors accept header', async (t) => {
         '*/*',
         'application/*',
         'application/json',
+        '*/*,text/html;q=0.9',
+        'application/*,text/html',
+        'application/*,text/html;q=0.9',
         'application/json,text/html',
+        'application/json,text/html;q=0.9',
+        'text/html;q=0.9,*/*',
+        'text/html;q=0.9,application/*',
         'text/html;q=0.9,application/json',
         'text/plain'
     ];
